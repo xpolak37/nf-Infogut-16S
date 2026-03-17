@@ -176,14 +176,14 @@ if [ -f "silva-138.2-ssu-nr99-341F-805R-classifier.qza" ]; then
 else
     log_info "Downloading classifiers from Zenodo..."
     
-    wget -c https://zenodo.org/records/17668622/files/db_mOTU.tar.gz \
+    wget "https://filesender.cesnet.cz/download.php?token=a1fbed9f-128d-4353-ab69-62d15298aa2d&files_ids=831961" \
         -O classifiers.tar.gz 2>&1 | tee -a "${LOGFILE}"
     
     if [ $? -eq 0 ]; then
         log_success "Download completed"
         
         log_info "Extracting folder..."
-        tar -xzvf classifiers.tar.gz --strip-components=1 >> "${LOGFILE}" 2>&1
+        tar -xzvf classifiers.tar.gz >> "${LOGFILE}" 2>&1
         
         if [ -f "silva-138.2-ssu-nr99-341F-805R-classifier.qza" ]; then
             log_success "Classifiers extracted successfully"
@@ -214,14 +214,15 @@ SING_DIR="${INSTALL_DIR}/singularity_cache"
 cd "${SING_DIR}"
 
 declare -A CONTAINERS=(
+    ["quay.io-biocontainers-bbmap-39.52--he5f24ec_0.img"]="docker://quay.io/biocontainers/bbmap:39.52--he5f24ec_0"
+    ["quay.io-biocontainers-bioconductor-dada2-1.38.0--r45ha27e39d_0.img"]="docker://quay.io/biocontainers/bioconductor-dada2:1.38.0--r45ha27e39d_0"
+    ["quay.io-biocontainers-bioconductor-decipher-3.6.0--r45h01b2380_0.img"]="docker://quay.io/biocontainers/bioconductor-decipher:3.6.0--r45h01b2380_0"
+    ["quay.io-biocontainers-cutadapt-5.2--py311haab0aaa_0.img"]="docker://quay.io/biocontainers/cutadapt:5.2--py311haab0aaa_0"
     ["quay.io-biocontainers-fastqc-0.12.1--hdfd78af_0.img"]="docker://quay.io/biocontainers/fastqc:0.12.1--hdfd78af_0"
-    ["quay.io-biocontainers-fastp-0.23.4--hadf994f_3.img"]="docker://quay.io/biocontainers/fastp:0.23.4--hadf994f_3"
-    ["quay.io-biocontainers-metaphlan-4.2.4--pyhdfd78af_0.img"]="docker://quay.io/biocontainers/metaphlan:4.2.4--pyhdfd78af_0"
     ["quay.io-biocontainers-multiqc-1.21--pyhdfd78af_0.img"]="docker://quay.io/biocontainers/multiqc:1.21--pyhdfd78af_0"
-    ["quay.io-biocontainers-taxpasta-0.7.0--pyhdfd78af_0.img"]="docker://quay.io/biocontainers/taxpasta:0.7.0--pyhdfd78af_0"
-    ["aponsero-infogut-motus-4.0.4.img"]="library://aponsero/infogut/motus:4.0.4"
+    ["quay.io-biocontainers-pandas-2.2.1.img"]="docker://quay.io/biocontainers/pandas:2.2.1"
+    ["quay.io-qiime2-amplicon-2026.1.img"]="docker://quay.io/qiime2/amplicon:2026.1"
 )
-
 CONTAINER_COUNT=0
 TOTAL_CONTAINERS=${#CONTAINERS[@]}
 

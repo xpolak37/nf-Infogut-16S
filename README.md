@@ -2,7 +2,7 @@
 
 ## Overview
 
-This Nextflow pipeline performs taxonomic profiling of paired-end 16S rRNA amplicon data (V3V4 region). The pipeline integrates quality control, read preprocessing, and taxonomic profiling using three complementary tools (DADA2, DEBLUR and USEARCH-UNOISE) to provide robust microbial community characterization.
+This Nextflow pipeline performs taxonomic profiling of paired-end 16S rRNA amplicon data (V3V4 region). The pipeline integrates quality control, read preprocessing, and ASV inference and taxonomic assignment using multiple complementary tools (ASV inference: DADA2, DEBLUR and USEARCH-UNOISE; taxonomic assignment: QIIME BLAST, QIIME NAIVE BAYES, IDTAXA, ASSIGNTAXONOMY, SINTAX) to provide robust microbial community characterization.
 
 **Pipeline Version:** 1.0.0  
 **Author:** Petra Polakovicova  
@@ -10,7 +10,7 @@ This Nextflow pipeline performs taxonomic profiling of paired-end 16S rRNA ampli
 
 ---
 
-## Testing Instructions
+##  Testing Instructions
 
 Instructions for testing the pipeline's reproducibility are available as 
 [Markdown](docs/testing_readme.md), as well as in 
@@ -300,13 +300,18 @@ results
 
 | Directory | Contents | Description |
 |-----------|----------|-------------|
-| `01_fastqc_raw/` | FastQC reports | Quality metrics for raw reads |
-| `02_fastp/` | Trimmed reads + reports | Cleaned FASTQ files and filtering statistics |
-| `03_fastqc_clean/` | FastQC reports | Quality metrics for cleaned reads |
-| `04_metaphlan4/` | Taxonomic profiles | MetaPhlAn4 relative abundance tables |
-| `05_motus/` | Taxonomic profiles | mOTUs relative abundance tables |
-| `06_multiqc/` | Aggregated report | Combined QC metrics from all samples |
-| `pipeline_info/` | Execution reports | Pipeline execution statistics and DAG |
+| `01_fastqc_raw/` | FastQC HTML & ZIP reports | Quality metrics for raw reads |
+| `01_fastqc_trimmed/` | FastQC HTML & ZIP reports | Quality metrics for trimmed reads (after Cutadapt) |
+| `02_cutadapt/` | Trimmed FASTQ files | Reads after adapter and primer removal |
+| `03_dada2/` | ASV tables & FASTA sequences | DADA2 ASV inference outputs |
+| `04_bbmap/` | Merged FASTQ reads | Paired-end reads merged for Deblur/UNOISE |
+| `05_deblur/` | ASV tables & FASTA sequences | Deblur ASV inference outputs |
+| `07a_qiime_naive_bayes/` | Taxa tables (DADA2 & Deblur) | Taxonomic assignment using QIIME naive-bayes classifier |
+| `07b_qiime_blast/` | Taxa tables (DADA2 & Deblur) | Taxonomic assignment using QIIME BLAST classifier |
+| `07c_assigntaxonomy/` | Taxa tables (DADA2 & Deblur) | Taxonomic assignment using DADA2 assignTaxonomy |
+| `07d_idtaxa/` | Taxa tables (DADA2 & Deblur) | Taxonomic assignment using DECIPHER IdTaxa |
+| `08_multiqc/` | MultiQC reports & JSON/logs | Aggregated QC metrics from all tools and samples |
+| `pipeline_info/` | HTML, DAG, trace, timeline | Pipeline execution reports and workflow DAG |
 
 ---
 
@@ -316,6 +321,8 @@ If you use this pipeline, please cite:
 
 - **Nextflow:** Di Tommaso, P., et al. (2017). Nextflow enables reproducible computational workflows. Nature Biotechnology, 35(4), 316-319.
 - **FastQC:** Andrews, S. (2010). FastQC: A Quality Control Tool for High Throughput Sequence Data.
-TO DO 
 - **MultiQC:** Ewels, P., et al. (2016). MultiQC: summarize analysis results for multiple tools and samples in a single report. Bioinformatics, 32(19), 3047-3048.
-
+- **DADA2:** Callahan,  et al. (2016).  DADA2: High-resolution sample inference from Illumina amplicon data. Nat Methods 13, 581–583.
+- **DEBLUR:** Amir, A., et al. (2017). Deblur Rapidly Resolves Single-Nucleotide Community Sequence Patterns. mSystems, 2(2), e00191-16. 
+- **QIIME2:** Bolyen E, et al.(2019). Reproducible, interactive, scalable and extensible microbiome data science using QIIME 2. Nature Biotechnology 37: 852–857. 
+- **DECIPHER:** ES Wright (2024). Fast and Flexible Search for Homologous Biological Sequences with DECIPHER v3."The R Journal, 16(2), 191-200.

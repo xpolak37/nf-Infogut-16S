@@ -112,7 +112,7 @@ with open(input_file, newline='') as fin, \
     header[0] = "SeqID"
     header[1] = "Taxonomy"
     header[2] = "Confidence"
-    
+
     writer.writerow(header)
 
     for row in reader:

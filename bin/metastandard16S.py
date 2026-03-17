@@ -147,7 +147,10 @@ def merge_taxa_genus(asv_table, taxa_table):
     
     # Keep only up to genus level
     rank_prefixes = ["d", "p", "c", "o", "f", "g"]
-    tax_df = tax_df[[col for col in rank_prefixes if col in tax_df.columns]]
+    tax_df = tax_df.reindex(columns=rank_prefixes, fill_value="Unclassified")
+    
+    # Replace empty strings, whitespace-only, and NaN with Unclassified
+    tax_df = tax_df.replace(r'^\s*$', "Unclassified", regex=True)
     tax_df = tax_df.fillna("Unclassified")
     
     # Merge taxonomy with ASV table on SeqID
@@ -172,6 +175,8 @@ def merge_taxa_genus(asv_table, taxa_table):
     # Drop individual rank columns and reorder
     grouped = grouped.drop(columns=rank_prefixes)
     grouped = grouped[["SeqID"] + sample_cols]
+    grouped = grouped.rename(columns={"SeqID": "TaxID"})
+
     
     return grouped
 
@@ -184,6 +189,10 @@ def main():
     asv_tool = detect_tool(args.taxa_table)
     result_df = merge_taxa_genus(asv_table, taxa_table)
     
+    # Convert counts to relative abundances (columns sum to 1)
+    sample_cols = [col for col in result_df.columns if col != "TaxID"]
+    result_df[sample_cols] = result_df[sample_cols].div(result_df[sample_cols].sum(axis=0), axis=1)
+   
     # saving the final merged table
     outfile = f"{asv_tool}_{args.taxa_tool}_{args.run_id}_{args.level}.tsv"
     result_df.to_csv(outfile, sep="\t", index=False)
