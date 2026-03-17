@@ -1,0 +1,5 @@
+sample,read1,read2
+SRR13005968-test,test/SRR13005968-test_1.fastq.gz,test/SRR13005968-test_2.fastq.gz
+SRR13005969-test,test/SRR13005969-test_1.fastq.gz,test/SRR13005969-test_2.fastq.gz
+SRR13005986-test,test/SRR13005986-test_1.fastq.gz,test/SRR13005986-test_2.fastq.gz
+SRR13005987-test,test/SRR13005987-test_1.fastq.gz,test/SRR13005987-test_2.fastq.gz
