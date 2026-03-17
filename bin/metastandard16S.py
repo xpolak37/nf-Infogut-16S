@@ -166,11 +166,10 @@ def merge_taxa_genus(asv_table, taxa_table):
     
     # Reconstruct taxonomy string with prefixes
     grouped["SeqID"] = grouped[rank_prefixes].apply(
-        lambda row: ";".join([f"{prefix}__{row[prefix]}" 
-                              for prefix in rank_prefixes 
-                              if row[prefix] != "Unclassified"]),
-        axis=1
-    )
+    lambda row: ";".join([f"{prefix}__{row[prefix]}" 
+                          for prefix in rank_prefixes]),  # <-- removed the if condition
+    axis=1
+)
     
     # Drop individual rank columns and reorder
     grouped = grouped.drop(columns=rank_prefixes)
