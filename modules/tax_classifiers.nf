@@ -4,6 +4,7 @@ process QIIME_NAIVE_BAYES {
     input:
     path(asv_fasta)
     val denoising_tool  // 'dada2' or 'deblur' or 'unoise'
+    path classifier
 
     output:
     path("${denoising_tool}_taxa_table.tsv")
@@ -26,7 +27,7 @@ process QIIME_NAIVE_BAYES {
     # TAXONOMY
     qiime feature-classifier classify-sklearn \\
         --i-reads rep-seqs.qza \\
-        --i-classifier ${params.classifiers_dir}/silva-138.2-ssu-nr99-341F-805R-classifier.qza \\
+        --i-classifier ${classifier} \\
         --p-n-jobs ${task.cpus} \\
         --p-confidence ${params.qiime_naive_bayes_confidence} \\
         --o-classification taxonomy.qza 
@@ -64,6 +65,8 @@ process QIIME_BLAST {
     input:
     path(asv_fasta)
     val denoising_tool  // 'dada2' or 'deblur' or 'unoise'
+    path classifier_reads
+    path classifier_tax 
 
     output:
     path("${denoising_tool}_taxa_table.tsv")
@@ -85,8 +88,8 @@ process QIIME_BLAST {
     # TAXONOMY
     qiime feature-classifier classify-consensus-blast  \\
         --i-query rep-seqs.qza \\
-        --i-reference-reads ${params.classifiers_dir}/silva-138.2-ssu-nr99-seqs-filt.qza \\
-        --i-reference-taxonomy ${params.classifiers_dir}/silva-138.2-ssu-nr99-tax.qza \\
+        --i-reference-reads ${classifier_reads} \\
+        --i-reference-taxonomy ${classifier_tax} \\
         --p-num-threads ${task.cpus} \\
         --p-perc-identity ${params.blast_percidentity} \\
         --p-strand both \\
@@ -127,6 +130,7 @@ process ASSIGNTAXONOMY {
     input:
     path(asv_fasta)
     val denoising_tool  // 'dada2' or 'deblur' or 'unoise'
+    path classifier
 
     output:
     path("${denoising_tool}_taxa_table.tsv"), emit: taxa_table
@@ -135,7 +139,7 @@ process ASSIGNTAXONOMY {
     """
     Rscript ${projectDir}/bin/assigntaxonomy.R \
         ${asv_fasta} \
-       ${params.classifiers_dir}/dada2_trainset_v3v4_silva_nr99_v138_2.fa.gz \
+        ${classifier} \
         ${task.cpus} \
         ${denoising_tool}
     """
@@ -147,7 +151,8 @@ process IDTAXA {
     input:
     path(asv_fasta)
     val denoising_tool  // 'dada2' or 'deblur' or 'unoise'
-
+    path classifier
+    
     output:
     path("${denoising_tool}_taxa_table.tsv")
 
@@ -155,7 +160,7 @@ process IDTAXA {
     """
     Rscript ${projectDir}/bin/idtaxa.R \
         ${asv_fasta} \
-        ${params.classifiers_dir}/idtaxa_trainingSet_V3V4_silva_138_2.RData \
+        ${classifier} \
         ${task.cpus} \
         ${denoising_tool}
     """

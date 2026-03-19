@@ -111,43 +111,61 @@ workflow {
     // TAXONOMIC ASSIGNMENT
     ////////////////////////////////////////////
     // 1 QIIME NAIVE BAYES
+    qiime_NB_classifier = file(params.classifiers_dir + "/silva-138.2-ssu-nr99-341F-805R-classifier.qza")
 
     // 1A DADA2
-    QIIME_NAIVE_BAYES_DADA2(DADA2.out.fasta,"dada2")
+    QIIME_NAIVE_BAYES_DADA2(DADA2.out.fasta,"dada2",
+                            qiime_NB_classifier)
 
     // 1B DEBLUR
-    QIIME_NAIVE_BAYES_DEBLUR(QIIME_DEBLUR.out.fasta,"deblur")
+    QIIME_NAIVE_BAYES_DEBLUR(QIIME_DEBLUR.out.fasta,"deblur",
+                            qiime_NB_classifier)
 
     // 1C UNOISE - TO DO 
 
     ////////////////////////////////////////////
     // 2 QIIME BLAST
+    qiime_BLAST_classifier_reads = file(params.classifiers_dir + "/silva-138.2-ssu-nr99-seqs-filt.qza")
+    qiime_BLAST_classifier_tax = file(params.classifiers_dir + "/silva-138.2-ssu-nr99-tax.qza")
+
     // 2A DADA2
-    QIIME_BLAST_DADA2(DADA2.out.fasta,"dada2")
+    QIIME_BLAST_DADA2(DADA2.out.fasta,"dada2",
+                    qiime_BLAST_classifier_reads,
+                    qiime_BLAST_classifier_tax)
    
     // 2B DEBLUR
-    QIIME_BLAST_DEBLUR(QIIME_DEBLUR.out.fasta,"deblur")
+    QIIME_BLAST_DEBLUR(QIIME_DEBLUR.out.fasta,"deblur",
+                    qiime_BLAST_classifier_reads,
+                    qiime_BLAST_classifier_tax)
 
     // 2C UNOISE - TO DO 
 
 
     ///////////////////////////////////////////////
     // 3 IDTAXA
+    idtaxa_classifier = file(params.classifiers_dir + "/idtaxa_trainingSet_V3V4_silva_138_2.RData")
+
     // 3A DADA2
-    IDTAXA_DADA2(DADA2.out.fasta,"dada2")
+    IDTAXA_DADA2(DADA2.out.fasta,"dada2",
+                idtaxa_classifier)
 
     // 3B DEBLUR
-    IDTAXA_DEBLUR(QIIME_DEBLUR.out.fasta,"deblur")
+    IDTAXA_DEBLUR(QIIME_DEBLUR.out.fasta,"deblur",
+                idtaxa_classifier)
 
     // 3C UNOISE - TO DO 
 
     ///////////////////////////////////////////////
     // 4 ASSIGNTAXONOMY
+    assigntaxonomy_classifier = file(params.classifiers_dir + "/dada2_trainset_v3v4_silva_nr99_v138_2.fa.gz")
+
     // 4A DADA2
-    ASSIGNTAXONOMY_DADA2(DADA2.out.fasta,"dada2")
+    ASSIGNTAXONOMY_DADA2(DADA2.out.fasta,"dada2",
+                        assigntaxonomy_classifier)
 
     // 4B DEBLUR
-    ASSIGNTAXONOMY_DEBLUR(QIIME_DEBLUR.out.fasta,"deblur")
+    ASSIGNTAXONOMY_DEBLUR(QIIME_DEBLUR.out.fasta,"deblur",
+                        assigntaxonomy_classifier)
 
     // 4C UNOISE - TO DO 
 
