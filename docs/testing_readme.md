@@ -1,4 +1,4 @@
-# WMGS Benchmarking Framework Tutorial
+# 16S Benchmarking Framework Tutorial
 
 **Authors:**  
 Petra Polakovicova¹, Alise Ponsero²  
@@ -17,6 +17,10 @@ Petra Polakovicova¹, Alise Ponsero²
 7. [Possible Problems](#7-possible-problems)
 
 ---
+
+## Requirements
+
+Users will need at least 8 GB of RAM, 5 GB of storage for downloading the classifiers and Singularity images, and additional storage for running the pipeline (for testing purposes, 6 GB of total storage should be sufficient).
 
 ## 1. Installing Nextflow & Singularity
 
@@ -80,7 +84,7 @@ Resource Locations:
 
 ## 3. Editing your Params
 
-If the installation was successful, open `nextflow.config` and update `</path/to/your/installation/directory/>` in the following parameters:
+If the installation was successful, open `nextflow.config` in the nf-Infogut-16S directory and update `</path/to/your/installation/directory/>` in the following parameters:
 
 ```bash
 params {
@@ -182,11 +186,25 @@ TO BE ADDED
 
 ## 7. Possible Problems
 
-**No space left on device error:**  
+**No space left on device error**  
 If the pipeline fails with this error, set a custom temp directory before running:
 
 ```bash
 export SINGULARITY_TMPDIR=</path/to/your/desired/tmp>
+```
+
+**/usr/bin/env: 'python': No such file or directory**
+
+This error occurs when your system only recognizes `python3` as a command, not `python`. You can fix this by creating a symlink manually:
+
+```bash
+ln -s /usr/bin/python3 /usr/bin/python
+```
+
+Or by installing the `python-is-python3` package (Debian/Ubuntu only):
+
+```bash
+sudo apt install python-is-python3
 ```
 
 **Other issues:**  

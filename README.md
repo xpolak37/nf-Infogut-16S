@@ -135,7 +135,7 @@ The pipeline uses **Singularity** containers for reproducibility and portability
 
 ### Prerequisites
 
-The pipeline uses Nextflow ≥22.10.0 and Singularity which is assumed to be pre-installed by the user.
+The pipeline uses Nextflow ≥22.10.0 and Singularity which is assumed to be pre-installed by the user. Users will need at least 8 GB of RAM, 5 GB of storage for downloading the classifier and Singularity images, and additional storage for running the pipeline (this can vary depending on how many samples you have).
 
 ### Quick Setup (Recommended)
 
@@ -155,7 +155,7 @@ The pipeline includes an automated setup script that downloads all required data
 
 1. Creates directory structure:
    - `classifiers/` - pre-built taxonomic classifiers (~500MB)
-   - `singularity_cache/` - Container images (~3 GB)
+   - `singularity_cache/` - Container images (~5 GB)
    - `logs/` - Setup logs
 
 2. Downloads pre-builts taxonomic classifiers from Zenodo
