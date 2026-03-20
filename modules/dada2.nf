@@ -2,7 +2,9 @@ process DADA2 {
     publishDir "${params.outdir}/03_dada2", mode: 'copy'
     
     input:
-    path('*')
+    val sample_ids
+    path read1_files
+    path read2_files
     
     output:
     path "asv_table.tsv", emit: asv_table
@@ -10,13 +12,17 @@ process DADA2 {
     path "ASV_sequences.fasta", emit: fasta
     
     script:
+    // IMPORTANT: pairing relies on positional alignment
+    // ids[i], r1s[i], r2s[i] must correspond to the same sample
+    def ids = sample_ids.join(' ')
+    def r1s = read1_files.join(' ')
+    def r2s = read2_files.join(' ')
+    
     """
-    R1_files=\$(ls *R1.trimmed.fastq.gz | sort | tr '\\n' ' ')
-    R2_files=\$(ls *R2.trimmed.fastq.gz | sort | tr '\\n' ' ')
-
     Rscript ${projectDir}/bin/dada2.R \\
-        --input_R1 \${R1_files} \\
-        --input_R2 \${R2_files} \\
+        --sample_ids ${ids} \\
+        --input_R1 ${r1s} \\
+        --input_R2 ${r2s} \\
         --nproc ${task.cpus} \\
         --truncQ ${params.truncQ} \\
         --truncLen_R1 ${params.truncLen_R1} \\
