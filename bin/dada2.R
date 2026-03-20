@@ -22,8 +22,9 @@ rget_args_multi <- function(args, flag) {
   args[start:(end - 1)]
 }
 
-input_R1   <- rget_args_multi(args, "--input_R1")
-input_R2   <- rget_args_multi(args, "--input_R2")
+sample_ids  <- rget_args_multi(args, "--sample_ids")
+fnFs        <- rget_args_multi(args, "--input_R1")
+fnRs        <- rget_args_multi(args, "--input_R2")
 nproc       <- as.integer(get_arg(args, "--nproc",        "1"))
 truncQ      <- as.integer(get_arg(args, "--truncQ",       "2"))
 truncLen_R1 <- as.integer(get_arg(args, "--truncLen_R1",  "250"))
@@ -33,20 +34,10 @@ maxEE_R2    <- as.double(get_arg(args,  "--maxEE_R2",     "2"))
 maxMismatch <- as.integer(get_arg(args, "--maxMismatch",  "0"))
 minOverlap  <- as.integer(get_arg(args, "--minOverlap",   "12"))
 
-# samples
-fnFs <- sort(input_R1)
-fnRs <- sort(input_R2)
-
-sample.names <- sub("_R[12].trimmed.fastq.gz", "", basename(fnFs))
-
 # filtering
-filtFs <- file.path("filtered", paste0(sample.names, "_F_filt.fastq.gz"))
-filtRs <- file.path("filtered", paste0(sample.names, "_R_filt.fastq.gz"))
+filtFs <- file.path("filtered", paste0(sample_ids, "_F_filt.fastq.gz"))
+filtRs <- file.path("filtered", paste0(sample_ids, "_R_filt.fastq.gz"))
 
-names(filtFs) <- sample.names
-names(filtRs) <- sample.names
-  
-# filtering function
 out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen = c(truncLen_R1,truncLen_R2), maxN=0, maxEE=c(maxEE_R1,maxEE_R2), truncQ=truncQ, rm.phix=TRUE,
                      compress=TRUE, multithread=nproc) 
     
@@ -79,7 +70,7 @@ write.table(final_seqtab, file="asv_table.tsv",sep="\t",quote=FALSE,row.names=FA
 getN <- function(x) sum(getUniques(x))
 final_track <- cbind(out, sapply(dadaFs, getN), sapply(dadaRs, getN), sapply(mergers, getN), rowSums(seqtab.nochim))
 colnames(final_track) <- c("input", "filtered", "denoisedF", "denoisedR", "merged", "nonchim")
-rownames(final_track) <- sample.names 
+rownames(final_track) <- sample_ids 
 final_track <- cbind(
   SampleID = rownames(final_track),
   final_track
