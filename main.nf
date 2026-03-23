@@ -109,7 +109,6 @@ workflow {
 
 
     // TAXONOMIC ASSIGNMENT
-    ////////////////////////////////////////////
     // 1 QIIME NAIVE BAYES
     qiime_NB_classifier = file(params.classifiers_dir + "/silva-138.2-ssu-nr99-341F-805R-classifier.qza")
 
@@ -123,7 +122,6 @@ workflow {
 
     // 1C UNOISE - TO DO 
 
-    ////////////////////////////////////////////
     // 2 QIIME BLAST
     qiime_BLAST_classifier_reads = file(params.classifiers_dir + "/silva-138.2-ssu-nr99-seqs-filt.qza")
     qiime_BLAST_classifier_tax = file(params.classifiers_dir + "/silva-138.2-ssu-nr99-tax.qza")
@@ -141,7 +139,6 @@ workflow {
     // 2C UNOISE - TO DO 
 
 
-    ///////////////////////////////////////////////
     // 3 IDTAXA
     idtaxa_classifier = file(params.classifiers_dir + "/idtaxa_trainingSet_V3V4_silva_138_2.RData")
 
@@ -155,7 +152,6 @@ workflow {
 
     // 3C UNOISE - TO DO 
 
-    ///////////////////////////////////////////////
     // 4 ASSIGNTAXONOMY
     assigntaxonomy_classifier = file(params.classifiers_dir + "/dada2_trainset_v3v4_silva_nr99_v138_2.fa.gz")
 
@@ -169,17 +165,7 @@ workflow {
 
     // 4C UNOISE - TO DO 
 
-    ///////////////////////////////////////////////
-    // 5 SINTAX 
 
-    // 5A DADA2
-
-    // 5B DEBLUR
-
-    // 5C SINTAX
-
-
-    ///////////////////////////////////////////////
     // 6 METASTANDARD 16S
     // 6A DADA2
     AT_DADA2_METASTANDARD(DADA2.out.asv_table,ASSIGNTAXONOMY_DADA2.out,"AssignTaxonomy")

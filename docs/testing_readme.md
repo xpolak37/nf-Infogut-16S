@@ -20,7 +20,7 @@ Petra Polakovicova¹, Alise Ponsero²
 
 ## Requirements
 
-Users will need at least 8 GB of RAM, 5 GB of storage for downloading the classifiers and Singularity images, and additional storage for running the pipeline (for testing purposes, 6 GB of total storage should be sufficient).
+Users will need at least 16 CPUs, 8 GB of RAM, 5 GB of storage for downloading the classifiers and Singularity images, and additional storage for running the pipeline (for testing purposes, 6 GB of total storage should be sufficient).
 
 ## 1. Installing Nextflow & Singularity
 
