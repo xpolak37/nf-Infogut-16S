@@ -87,11 +87,19 @@ workflow {
     
     // DADA2
     dada2_input = CUTADAPT.out.reads
-    .map { sample_id, r1, r2 -> [r1, r2] }
-    .flatten()
-    .collect()
+        .collect(flat: false)
+        // IMPORTANT: pairing relies on positional alignment
+        // ids[i], r1s[i], r2s[i] must correspond to the same sample
+        .map { samples -> 
+            def sorted = samples.toSorted { sample -> sample[0]}
+            [
+                ids: sorted.collect { sample -> sample[0] },
+                r1s: sorted.collect { sample -> sample[1] },
+                r2s: sorted.collect { sample -> sample[2] }
+            ]
+        }
 
-    DADA2(dada2_input)
+    DADA2(dada2_input.ids, dada2_input.r1s, dada2_input.r2s)
 
     // PREPROCESSING FOR DEBLUR AND USEARCH
     MERGING_READS(CUTADAPT.out.reads)
