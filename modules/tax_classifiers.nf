@@ -18,6 +18,12 @@ process QIIME_NAIVE_BAYES {
     export TMPDIR=\${PWD}/tmp
     mkdir -p \${PWD}/tmp
 
+    export MPLCONFIGDIR=\${PWD}/matplotlib_cache
+    mkdir -p \${PWD}/matplotlib_cache
+
+    export PYTHONPATH=\${PYTHONPATH:-}
+    export MPLBACKEND=Agg
+
     # IMPORT
     qiime tools import \
     --input-path ${asv_fasta} \
@@ -78,6 +84,12 @@ process QIIME_BLAST {
 
     export TMPDIR=\${PWD}/tmp
     mkdir -p \${PWD}/tmp
+
+    export MPLCONFIGDIR=\${PWD}/matplotlib_cache
+    mkdir -p \${PWD}/matplotlib_cache
+
+    export PYTHONPATH=\${PYTHONPATH:-}
+    export MPLBACKEND=Agg
     
     # IMPORT
     qiime tools import \
