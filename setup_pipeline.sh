@@ -176,7 +176,7 @@ if [ -f "silva-138.2-ssu-nr99-341F-805R-classifier.qza" ]; then
 else
     log_info "Downloading classifiers from Zenodo..."
     
-    wget "https://filesender.cesnet.cz/download.php?token=a1fbed9f-128d-4353-ab69-62d15298aa2d&files_ids=831961" \
+    wget "https://zenodo.org/records/17638726/files/classifiers.tar.gz?download=1" \
         -O classifiers.tar.gz 2>&1 | tee -a "${LOGFILE}"
     
     if [ $? -eq 0 ]; then
@@ -222,6 +222,8 @@ declare -A CONTAINERS=(
     ["quay.io-biocontainers-multiqc-1.21--pyhdfd78af_0.img"]="docker://quay.io/biocontainers/multiqc:1.21--pyhdfd78af_0"
     ["quay.io-biocontainers-pandas-2.2.1.img"]="docker://quay.io/biocontainers/pandas:2.2.1"
     ["quay.io-qiime2-amplicon-2026.1.img"]="docker://quay.io/qiime2/amplicon:2026.1"
+    ["quay.io-biocontainers-vsearch-2.30.5--h0bb26bb_0.img"]="docker://quay.io/biocontainers/vsearch:2.30.5--h0bb26bb_0"
+    
 )
 CONTAINER_COUNT=0
 TOTAL_CONTAINERS=${#CONTAINERS[@]}

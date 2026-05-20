@@ -115,9 +115,9 @@ flowchart TB
 | **FastQC** | 0.12.1 | quay.io/biocontainers/fastqc:0.12.1--hdfd78af_0 | Quality control assessment of raw and trimmed reads |
 | **Cutadapt** | 5.2 | quay.io/biocontainers/cutadapt:5.2--py310hdfd78af_0 | Primer and adapter trimming |
 | **DADA2** | 1.38.0 | quay.io-biocontainers-bioconductor-dada2:1.38.0--r45ha27e39d_0 | ASV inference using divisive algorithm |
-| **BBMAP-BBMERGE** | 39.52 | quay.io-biocontainers-bbmap:39.52--he5f24ec_0 | Merges paired-end reads into single-end reads |
+| **VSEARCH-fastq_mergepairs** | 2.30.5 | quay.io-biocontainers-vsearch:2.30.5--h0bb26bb_0 | Merges paired-end reads into single-end reads |
 | **QIIME2 Deblur plugin** | 2026.1 | qiime2/core:2026.1 | Quality filtering and ASV inference via Deblur |
-| **UNOISE** | TO DO | TO DO | ASV inference (method TBD) |
+| **UNOISE** | 2.30.5 | quay.io-biocontainers-vsearch:2.30.5--h0bb26bb_0 | ASV inference using UNOISE3 |
 | **QIIME naive-bayes classifier** | 2026.1 | quay.io-qiime2-amplicon:2026.1 | Taxonomic assignment using pre-trained sklearn classifier |
 | **QIIME BLAST classifier** | 2026.1 | quay.io-qiime2-amplicon:2026.1 | Taxonomic assignment using BLAST classifier |
 | **IDTAXA (DECIPHER)** | 3.6.0 | quay.io-biocontainers-bioconductor-decipher-3.6.0--r45h01b2380_0 | Taxonomic assignment using DECIPHER IdTaxa function |
@@ -135,7 +135,7 @@ The pipeline uses **Singularity** containers for reproducibility and portability
 
 ### Prerequisites
 
-The pipeline uses Nextflow ≥22.10.0 and Singularity which is assumed to be pre-installed by the user. Users will need at least 8 GB of RAM, 5 GB of storage for downloading the classifier and Singularity images, and additional storage for running the pipeline (this can vary depending on how many samples you have).
+The pipeline uses Nextflow ≥22.10.0 and Singularity which is assumed to be pre-installed by the user. Users will need at least 8 GB of RAM, 5 GB of storage for downloading the classifiers and Singularity images, and additional storage for running the pipeline (this can vary depending on how many samples you have).
 
 ### Quick Setup (Recommended)
 
@@ -237,66 +237,8 @@ nextflow run main.nf \
   --classifiers /path/to/classifiers_dir
 ```
 
-## Output Structure
 
-The pipeline generates the following output directory structure:
-
-```
-results
-├── 01_fastqc_raw
-│   ├── SRR13005968-test_1_fastqc.html
-│   ├── SRR13005968-test_1_fastqc.zip
-│   ├── ...
-├── 01_fastqc_trimmed
-│   ├── SRR13005968-test_R1.trimmed_fastqc.html
-│   ├── SRR13005968-test_R1.trimmed_fastqc.zip
-│   ├── ...
-├── 02_cutadapt
-│   ├── SRR13005968-test_R1.trimmed.fastq.gz
-│   ├── SRR13005968-test_R2.trimmed.fastq.gz
-│   ├── ...
-├── 03_dada2
-│   ├── ASV_sequences.fasta
-│   ├── asv_table.tsv
-│   └── track_control.tsv
-├── 04_bbmap
-│   ├── SRR13005968-test-mergedpairs.fastq.gz
-│   ├── SRR13005969-test-mergedpairs.fastq.gz
-│   ├── ..
-├── 05_deblur
-│   ├── asv_table.tsv
-│   ├── dna-sequences.fasta
-│   └── stats.csv
-├── 07a_qiime_naive_bayes
-│   ├── dada2_taxa_table.tsv
-│   └── deblur_taxa_table.tsv
-├── 07b_qiime_blast
-│   ├── dada2_taxa_table.tsv
-│   └── deblur_taxa_table.tsv
-├── 07c_assigntaxonomy
-│   ├── dada2_taxa_table.tsv
-│   └── deblur_taxa_table.tsv
-├── 07d_idtaxa
-│   ├── dada2_taxa_table.tsv
-│   └── deblur_taxa_table.tsv
-├── 08_multiqc
-│   ├── multiqc_citations.txt
-│   ├── multiqc_data.json
-│   ├── multiqc_fastqc.txt
-│   ├── multiqc_general_stats.txt
-│   ├── multiqc.log
-│   ├── multiqc_report.html
-│   ├── multiqc_report_data
-│   ├── multiqc_sources.txt
-│   └── multiqc_software_versions.txt
-└── pipeline_info
-    ├── dag.svg
-    ├── report.html
-    ├── timeline.html
-    └── trace.txt
-```
-
-### Output Descriptions
+## Output Descriptions
 
 | Directory | Contents | Description |
 |-----------|----------|-------------|
@@ -304,13 +246,15 @@ results
 | `01_fastqc_trimmed/` | FastQC HTML & ZIP reports | Quality metrics for trimmed reads (after Cutadapt) |
 | `02_cutadapt/` | Trimmed FASTQ files | Reads after adapter and primer removal |
 | `03_dada2/` | ASV tables & FASTA sequences | DADA2 ASV inference outputs |
-| `04_bbmap/` | Merged FASTQ reads | Paired-end reads merged for Deblur/UNOISE |
+| `04_merged/` | Merged FASTQ reads | Paired-end reads merged for Deblur/UNOISE |
 | `05_deblur/` | ASV tables & FASTA sequences | Deblur ASV inference outputs |
+| `06_unoise/` | ASV tables & FASTA sequences | UNOISE ASV inference outputs |
 | `07a_qiime_naive_bayes/` | Taxa tables (DADA2 & Deblur) | Taxonomic assignment using QIIME naive-bayes classifier |
 | `07b_qiime_blast/` | Taxa tables (DADA2 & Deblur) | Taxonomic assignment using QIIME BLAST classifier |
 | `07c_assigntaxonomy/` | Taxa tables (DADA2 & Deblur) | Taxonomic assignment using DADA2 assignTaxonomy |
 | `07d_idtaxa/` | Taxa tables (DADA2 & Deblur) | Taxonomic assignment using DECIPHER IdTaxa |
-| `08_multiqc/` | MultiQC reports & JSON/logs | Aggregated QC metrics from all tools and samples |
+| `08_metastandard/` | Standardized outputs of all executed denoising + taxonomic tools |
+| `09_multiqc/` | MultiQC reports & JSON/logs | Aggregated QC metrics from all tools and samples |
 | `pipeline_info/` | HTML, DAG, trace, timeline | Pipeline execution reports and workflow DAG |
 
 ---
