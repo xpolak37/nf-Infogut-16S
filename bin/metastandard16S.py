@@ -138,9 +138,30 @@ def parse_taxonomy(taxonomy_string):
             ranks[prefix.strip()] = value.strip()
     return ranks
 
-
-def merge_taxa_genus(asv_table, taxa_table):
+def length_check(asv_table,taxa_table):
+    """Check if asv and taxa table have same record length"""
+    if len(asv_table) != len(taxa_table):
+        raise ValueError(
+            f"ASV table ({len(asv_table)} records) and taxa table "
+            f"({len(taxa_table)} records) have different lengths"
+        )
+        
+def is_dna_seq(seqid_string):
+    """Check if SeqID is a DNA string (only A, C, G, T)"""
+    if not isinstance(seqid_string, str) or not seqid_string:
+        return False
+    return set(seqid_string.upper()) <= set("ACGT")
     
+    
+def merge_taxa_genus(asv_table, taxa_table):
+    # check of format (length and dnastring)
+    length_check(asv_table, taxa_table)
+    is_dna = is_dna_seq(taxa_table["SeqID"][0])
+    
+    # if other seqid was used in taxa table, change it
+    if not is_dna:
+        taxa_table["SeqID"] = asv_table["SeqID"].to_numpy()
+        
     # Parse taxonomy column into separate rank columns
     tax_parsed = taxa_table["Taxonomy"].apply(parse_taxonomy)
     tax_df = pd.DataFrame(tax_parsed.tolist(), index=taxa_table["SeqID"])
@@ -167,7 +188,7 @@ def merge_taxa_genus(asv_table, taxa_table):
     # Reconstruct taxonomy string with prefixes
     grouped["SeqID"] = grouped[rank_prefixes].apply(
     lambda row: ";".join([f"{prefix}__{row[prefix]}" 
-                          for prefix in rank_prefixes]),  # <-- removed the if condition
+                          for prefix in rank_prefixes]),  
     axis=1
 )
     
