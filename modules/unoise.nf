@@ -65,7 +65,9 @@ END {
         print seq
     }
 }
-' zotus.fasta > ASV_sequences.fasta
+' zotus.fasta > ASV_sequences_tmp.fasta
+
+tr '[:lower:]' '[:upper:]' < ASV_sequences_tmp.fasta > ASV_sequences.fasta
 
     # 8. Map all reads back to ZOTUs to build an abundance table ──
     vsearch --usearch_global filtered.fasta \
@@ -80,5 +82,6 @@ END {
         { print }
     ' otu_table_raw.tsv > asv_table.tsv
 
+    
     """
 }
