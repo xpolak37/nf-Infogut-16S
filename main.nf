@@ -34,23 +34,31 @@ include { CUTADAPT }                    from './modules/cutadapt'
 include { DADA2 }                       from './modules/dada2'
 include { MERGING_READS }               from './modules/merging_reads.nf'
 include { QIIME_IMPORT; QIIME_DEBLUR }  from './modules/deblur.nf'
+include { VSEARCH_UNOISE3 }             from './modules/unoise.nf'
 include { QIIME_NAIVE_BAYES as QIIME_NAIVE_BAYES_DADA2 }  from './modules/tax_classifiers.nf'
 include { QIIME_NAIVE_BAYES as QIIME_NAIVE_BAYES_DEBLUR }  from './modules/tax_classifiers.nf'
+include { QIIME_NAIVE_BAYES as QIIME_NAIVE_BAYES_UNOISE }  from './modules/tax_classifiers.nf'
 include { QIIME_BLAST as QIIME_BLAST_DADA2 }  from './modules/tax_classifiers.nf'
 include { QIIME_BLAST as QIIME_BLAST_DEBLUR }  from './modules/tax_classifiers.nf'
+include { QIIME_BLAST as QIIME_BLAST_UNOISE }  from './modules/tax_classifiers.nf'
 include { IDTAXA as IDTAXA_DADA2 }  from './modules/tax_classifiers.nf'
 include { IDTAXA as IDTAXA_DEBLUR }  from './modules/tax_classifiers.nf'
+include { IDTAXA as IDTAXA_UNOISE }  from './modules/tax_classifiers.nf'
 include { ASSIGNTAXONOMY as ASSIGNTAXONOMY_DADA2 }  from './modules/tax_classifiers.nf'
 include { ASSIGNTAXONOMY as ASSIGNTAXONOMY_DEBLUR }  from './modules/tax_classifiers.nf'
+include { ASSIGNTAXONOMY as ASSIGNTAXONOMY_UNOISE }  from './modules/tax_classifiers.nf'
 include { METASTANDARD as NB_DADA2_METASTANDARD }        from './modules/MetaStandard16S'
 include { METASTANDARD as NB_DEBLUR_METASTANDARD }       from './modules/MetaStandard16S'
+include { METASTANDARD as NB_UNOISE_METASTANDARD }       from './modules/MetaStandard16S'
 include { METASTANDARD as BLAST_DADA2_METASTANDARD }        from './modules/MetaStandard16S'
 include { METASTANDARD as BLAST_DEBLUR_METASTANDARD }       from './modules/MetaStandard16S'
+include { METASTANDARD as BLAST_UNOISE_METASTANDARD }       from './modules/MetaStandard16S'
 include { METASTANDARD as IDTAXA_DADA2_METASTANDARD }        from './modules/MetaStandard16S'
 include { METASTANDARD as IDTAXA_DEBLUR_METASTANDARD }       from './modules/MetaStandard16S'
+include { METASTANDARD as IDTAXA_UNOISE_METASTANDARD }       from './modules/MetaStandard16S'
 include { METASTANDARD as AT_DADA2_METASTANDARD }        from './modules/MetaStandard16S'
 include { METASTANDARD as AT_DEBLUR_METASTANDARD }       from './modules/MetaStandard16S'
-
+include { METASTANDARD as AT_UNOISE_METASTANDARD }       from './modules/MetaStandard16S'
 /*
 ========================================================================================
     MAIN WORKFLOW
@@ -105,8 +113,12 @@ workflow {
     QIIME_DEBLUR(QIIME_IMPORT.out)
 
 
-    // USEARCH - TO DO
+    // USEARCH 
+    unoise_input = MERGING_READS.out.reads
+        .map { sample_id, reads -> reads }
+        .collect()
 
+    VSEARCH_UNOISE3(unoise_input)
 
     // TAXONOMIC ASSIGNMENT
     // 1 QIIME NAIVE BAYES
@@ -120,7 +132,9 @@ workflow {
     QIIME_NAIVE_BAYES_DEBLUR(QIIME_DEBLUR.out.fasta,"deblur",
                             qiime_NB_classifier)
 
-    // 1C UNOISE - TO DO 
+    // 1C UNOISE 
+    QIIME_NAIVE_BAYES_UNOISE(VSEARCH_UNOISE3.out.fasta,"unoise",
+                            qiime_NB_classifier)
 
     // 2 QIIME BLAST
     qiime_BLAST_classifier_reads = file(params.classifiers_dir + "/silva-138.2-ssu-nr99-seqs-filt.qza")
@@ -136,8 +150,10 @@ workflow {
                     qiime_BLAST_classifier_reads,
                     qiime_BLAST_classifier_tax)
 
-    // 2C UNOISE - TO DO 
-
+    // 2C UNOISE
+    QIIME_BLAST_UNOISE(VSEARCH_UNOISE3.out.fasta,"unoise",
+                    qiime_BLAST_classifier_reads,
+                    qiime_BLAST_classifier_tax)
 
     // 3 IDTAXA
     idtaxa_classifier = file(params.classifiers_dir + "/idtaxa_trainingSet_V3V4_silva_138_2.RData")
@@ -151,6 +167,8 @@ workflow {
                 idtaxa_classifier)
 
     // 3C UNOISE - TO DO 
+    IDTAXA_UNOISE(VSEARCH_UNOISE3.out.fasta,"unoise",
+                idtaxa_classifier)
 
     // 4 ASSIGNTAXONOMY
     assigntaxonomy_classifier = file(params.classifiers_dir + "/dada2_trainset_v3v4_silva_nr99_v138_2.fa.gz")
@@ -164,7 +182,8 @@ workflow {
                         assigntaxonomy_classifier)
 
     // 4C UNOISE - TO DO 
-
+    ASSIGNTAXONOMY_UNOISE(VSEARCH_UNOISE3.out.fasta,"unoise",
+                        assigntaxonomy_classifier)
 
     // 6 METASTANDARD 16S
     // 6A DADA2
@@ -180,6 +199,10 @@ workflow {
     IDTAXA_DEBLUR_METASTANDARD(QIIME_DEBLUR.out.asv_table,IDTAXA_DEBLUR.out,"IDTAXA")
 
     // 6C UNOISE
+    AT_UNOISE_METASTANDARD(VSEARCH_UNOISE3.out.asv_table,ASSIGNTAXONOMY_UNOISE.out,"AssignTaxonomy")
+    NB_UNOISE_METASTANDARD(VSEARCH_UNOISE3.out.asv_table,QIIME_NAIVE_BAYES_UNOISE.out,"NaiveBayes")
+    BLAST_UNOISE_METASTANDARD(VSEARCH_UNOISE3.out.asv_table,QIIME_BLAST_UNOISE.out,"BLAST")
+    IDTAXA_UNOISE_METASTANDARD(VSEARCH_UNOISE3.out.asv_table,IDTAXA_UNOISE.out,"IDTAXA")
 
     // Collect all QC files for MultiQC
     ch_multiqc_files = Channel.empty()

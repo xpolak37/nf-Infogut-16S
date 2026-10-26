@@ -12,6 +12,15 @@ process QIIME_IMPORT {
     export NUMBA_CACHE_DIR=\${PWD}/numba_cache
     mkdir -p \${PWD}/numba_cache
 
+    export TMPDIR=\${PWD}/tmp
+    mkdir -p \${PWD}/tmp
+
+    export MPLCONFIGDIR=\${PWD}/matplotlib_cache
+    mkdir -p \${PWD}/matplotlib_cache
+
+    export PYTHONPATH=\${PYTHONPATH:-}
+    export MPLBACKEND=Agg
+
     # make manifest
     echo -e "sample-id\tabsolute-filepath\tdirection" > qiime_manifest.tsv
     for read in *-mergedpairs.fastq.gz; do
@@ -46,6 +55,12 @@ mkdir -p \${PWD}/numba_cache
 
 export TMPDIR=\${PWD}/tmp
 mkdir -p \${PWD}/tmp
+
+export MPLCONFIGDIR=\${PWD}/matplotlib_cache
+mkdir -p \${PWD}/matplotlib_cache
+
+export PYTHONPATH=\${PYTHONPATH:-}
+export MPLBACKEND=Agg
 
 # DENOISING WITH DEBLUR
 qiime deblur denoise-16S \\

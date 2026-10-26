@@ -33,6 +33,9 @@ maxEE_R2    <- as.double(get_arg(args,  "--maxEE_R2",     "2"))
 maxMismatch <- as.integer(get_arg(args, "--maxMismatch",  "0"))
 minOverlap  <- as.integer(get_arg(args, "--minOverlap",   "12"))
 
+# Set random seed for reproducibility
+set.seed(42)
+
 # samples
 fnFs <- sort(input_R1)
 fnRs <- sort(input_R2)

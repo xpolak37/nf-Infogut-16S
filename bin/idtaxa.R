@@ -9,6 +9,9 @@ classifier     <- args[2]
 nproc          <- as.integer(args[3])
 denoising_tool <- args[4]
 
+# Set random seed for reproducibility
+set.seed(42)
+
 # load classifier
 load(classifier)
 

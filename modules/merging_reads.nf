@@ -1,5 +1,5 @@
 process MERGING_READS {
-    publishDir "${params.outdir}/04_bbmap", mode: 'copy'
+    publishDir "${params.outdir}/04_merged", mode: 'copy'
     
     input:
     tuple val(sample_id), path(read1), path(read2)
@@ -9,15 +9,15 @@ process MERGING_READS {
     
     script:
     """
-    bbmerge.sh \\
-    in1=${read1} \\
-    in2=${read2} \\
-    qtrim=r \\
-    trimq=${params.bbmap_trimq} \
-    maxlength=${params.bbmap_maxlength} \
-    mininsert=${params.bbmap_mininsert} \
-    threads=${task.cpus} \
-    out=${sample_id}-mergedpairs.fastq.gz \
-    outu=/dev/null
+    vsearch -fastq_mergepairs ${read1} -reverse ${read2} \\
+    -fastq_maxdiffs ${params.maxdiff} \\
+    -fastq_maxdiffpct ${params.maxdiffpct} \\
+    -fastqout ${sample_id}-mergedpairs.fastq \\
+    -fastq_truncqual ${params.trunctail} \\
+    -fastq_minmergelen ${params.minmergelen} \\
+    -fastq_maxmergelen ${params.maxmergelen}
+
+    gzip -c ${sample_id}-mergedpairs.fastq > ${sample_id}-mergedpairs.fastq.gz  
+    rm ${sample_id}-mergedpairs.fastq
     """
 }
