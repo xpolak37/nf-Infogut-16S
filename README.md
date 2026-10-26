@@ -237,6 +237,15 @@ nextflow run main.nf \
   --classifiers /path/to/classifiers_dir
 ```
 
+**If you want to specify config file:**
+
+```bash
+nextflow run main.nf \
+  --input samplesheet.csv \
+  --outdir results \
+  -c custom.config
+```
+
 ## Output Structure
 
 The pipeline generates the following output directory structure:
