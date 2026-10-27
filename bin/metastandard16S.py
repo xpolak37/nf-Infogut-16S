@@ -211,7 +211,8 @@ def main():
     
     # Convert counts to relative abundances (columns sum to 1)
     sample_cols = [col for col in result_df.columns if col != "TaxID"]
-    result_df[sample_cols] = result_df[sample_cols].div(result_df[sample_cols].sum(axis=0), axis=1)
+    totals = result_df[sample_cols].sum(axis=0)
+    result_df[sample_cols] = result_df[sample_cols].div(totals, axis=1).fillna(0)
    
     # saving the final merged table
     outfile = f"{asv_tool}_{args.taxa_tool}_{args.run_id}_{args.level}.tsv"
